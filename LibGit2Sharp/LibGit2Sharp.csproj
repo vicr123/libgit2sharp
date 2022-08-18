@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>LibGit2Sharp brings all the might and speed of libgit2, a native Git implementation, to the managed world of .NET</Description>
+    <Description>Fork of LibGit2Sharp, using the system provided libgit2 and SSH support</Description>
     <Company>LibGit2Sharp contributors</Company>
     <Copyright>Copyright © LibGit2Sharp contributors</Copyright>
     <PackageTags>libgit2 git</PackageTags>
@@ -19,6 +19,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>libgit2sharp-native</PackageId>
     <RepositoryUrl>https://github.com/vicr123/libgit2sharp</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
