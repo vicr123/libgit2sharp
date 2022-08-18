@@ -4,7 +4,7 @@
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
     <LangVersion>12.0</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>LibGit2Sharp brings all the might and speed of libgit2, a native Git implementation, to the managed world of .NET</Description>
+    <Description>Fork of LibGit2Sharp, using the system provided libgit2 and SSH support</Description>
     <Company>LibGit2Sharp contributors</Company>
     <Copyright>Copyright © LibGit2Sharp contributors</Copyright>
     <PackageTags>libgit2 git</PackageTags>
@@ -24,6 +24,7 @@
     <MinVerBuildMetadata Condition="'$(libgit2_hash)' != ''">libgit2-$(libgit2_hash.Substring(0,7))</MinVerBuildMetadata>
     <PackageId>libgit2sharp-native</PackageId>
     <RepositoryUrl>https://github.com/vicr123/libgit2sharp</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
