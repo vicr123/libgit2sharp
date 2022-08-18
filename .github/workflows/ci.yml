@@ -30,6 +30,14 @@ jobs:
           name: NuGet packages
           path: bin/Packages/
           retention-days: 7
+      - name: Publish packages
+        uses: tanaka-takayoshi/nuget-publish-to-github-packages-action@v2.1
+        with:
+          nupkg-path: './bin/Packages/*.nupkg'
+          repo-owner: 'vicr123'
+          gh-user: 'vicr123'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
 #  test:
 #    name: Test / ${{ matrix.os }} / ${{ matrix.arch }} / ${{ matrix.tfm }}
 #    runs-on: ${{ matrix.os }}

@@ -17,6 +17,8 @@
     <PackageIcon>square-logo.png</PackageIcon>
     <PackageLicenseFile>App_Readme/LICENSE.md</PackageLicenseFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>libgit2sharp-native</PackageId>
+    <RepositoryUrl>https://github.com/vicr123/libgit2sharp</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
