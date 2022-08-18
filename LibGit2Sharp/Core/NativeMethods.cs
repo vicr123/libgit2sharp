@@ -14,7 +14,7 @@ namespace LibGit2Sharp.Core
     internal static class NativeMethods
     {
         public const uint GIT_PATH_MAX = 4096;
-        private const string libgit2 = NativeDllName.Name;
+        private const string libgit2 = "libgit2.so"; //NativeDllName.Name;
 
         // An object tied to the lifecycle of the NativeMethods static class.
         // This will handle initialization and shutdown of the underlying
@@ -595,6 +595,22 @@ namespace LibGit2Sharp.Core
             out IntPtr cred,
             [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier, MarshalTypeRef = typeof(StrictUtf8Marshaler))] string username,
             [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier, MarshalTypeRef = typeof(StrictUtf8Marshaler))] string password);
+
+        [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int git_cred_ssh_key_new(
+            out IntPtr cred,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier,
+                MarshalTypeRef = typeof(StrictUtf8Marshaler))]
+            string username,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier,
+                MarshalTypeRef = typeof(StrictUtf8Marshaler))]
+            string publickey,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier,
+                MarshalTypeRef = typeof(StrictUtf8Marshaler))]
+            string privatekey,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier,
+                MarshalTypeRef = typeof(StrictUtf8Marshaler))]
+            string passphrase);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void git_cred_free(IntPtr cred);
