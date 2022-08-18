@@ -22,6 +22,8 @@
     <PackageOutputPath>$(ArtifactsPath)\package</PackageOutputPath>
     <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
     <MinVerBuildMetadata Condition="'$(libgit2_hash)' != ''">libgit2-$(libgit2_hash.Substring(0,7))</MinVerBuildMetadata>
+    <PackageId>libgit2sharp-native</PackageId>
+    <RepositoryUrl>https://github.com/vicr123/libgit2sharp</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
