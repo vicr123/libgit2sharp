@@ -3792,13 +3792,8 @@ namespace LibGit2Sharp.Core
             using (var buf = new GitBuf())
             {
                 int result = pathRetriever(buf);
+                if (result != (int)GitErrorCode.Ok) return null;
 
-                if (result == (int)GitErrorCode.NotFound)
-                {
-                    return null;
-                }
-
-                Ensure.ZeroResult(result);
                 return LaxFilePathMarshaler.FromNative(buf.ptr);
             }
         }
