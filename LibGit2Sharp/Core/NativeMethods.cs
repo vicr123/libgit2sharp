@@ -14,7 +14,7 @@ namespace LibGit2Sharp.Core
     internal static class NativeMethods
     {
         public const uint GIT_PATH_MAX = 4096;
-        private const string libgit2 = "libgit2.so"; //NativeDllName.Name;
+        private const string libgit2 = "git2.so.1.5"; //NativeDllName.Name;
 
         // An object tied to the lifecycle of the NativeMethods static class.
         // This will handle initialization and shutdown of the underlying
@@ -94,6 +94,13 @@ namespace LibGit2Sharp.Core
                 if (NativeLibrary.TryLoad(libraryName, assembly, searchPath, out handle))
                 {
                     return handle;
+                }
+
+                // If ummmm If we're running on Windows, strip the version and try again:
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    var libname = libgit2.Split(".")[0];
+                    if (NativeLibrary.TryLoad(libname, assembly, searchPath, out handle)) return handle;
                 }
 
                 // We carry a number of .so files for Linux which are linked against various
