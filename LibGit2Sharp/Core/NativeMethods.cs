@@ -66,7 +66,7 @@ namespace LibGit2Sharp.Core
             return Path.Combine(nativeLibraryDir, libgit2 + Platform.GetNativeLibraryExtension());
         }
 
-#if NETSTANDARD
+#if NETFRAMEWORK
         private static bool TryUseNativeLibrary() => false;
 #else
         private static bool TryUseNativeLibrary()
@@ -109,7 +109,7 @@ namespace LibGit2Sharp.Core
                 {
                     // The libraries are located at 'runtimes/<rid>/native/lib{libraryName}.so'
                     // The <rid> ends with the processor architecture. e.g. fedora-x64.
-                    string assemblyDirectory = Path.GetDirectoryName(typeof(NativeMethods).Assembly.Location);
+                    string assemblyDirectory = Path.GetDirectoryName(AppContext.BaseDirectory);
                     string processorArchitecture = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
                     string runtimesDirectory = Path.Combine(assemblyDirectory, "runtimes");
 
@@ -184,11 +184,11 @@ namespace LibGit2Sharp.Core
         internal static extern void git_error_set_oom();
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern unsafe UInt32 git_blame_get_hunk_count(git_blame* blame);
+        internal static extern unsafe uint git_blame_get_hunk_count(git_blame* blame);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
         internal static extern unsafe git_blame_hunk* git_blame_get_hunk_byindex(
-            git_blame* blame, UInt32 index);
+            git_blame* blame, uint index);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
         internal static extern unsafe int git_blame_file(
@@ -234,7 +234,7 @@ namespace LibGit2Sharp.Core
         internal static extern unsafe IntPtr git_blob_rawcontent(git_object* blob);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern unsafe Int64 git_blob_rawsize(git_object* blob);
+        internal static extern unsafe long git_blob_rawsize(git_object* blob);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
         internal static extern unsafe int git_branch_create_from_annotated(
@@ -1117,7 +1117,7 @@ namespace LibGit2Sharp.Core
             IntPtr payload);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern unsafe int git_odb_open_wstream(out git_odb_stream* stream, git_odb* odb, Int64 size, GitObjectType type);
+        internal static extern unsafe int git_odb_open_wstream(out git_odb_stream* stream, git_odb* odb, long size, GitObjectType type);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
         internal static extern unsafe void git_odb_free(git_odb* odb);
@@ -1214,7 +1214,7 @@ namespace LibGit2Sharp.Core
         internal static extern unsafe UIntPtr git_packbuilder_object_count(git_packbuilder* packbuilder);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern unsafe UInt32 git_packbuilder_set_threads(git_packbuilder* packbuilder, UInt32 numThreads);
+        internal static extern unsafe uint git_packbuilder_set_threads(git_packbuilder* packbuilder, uint numThreads);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
         internal static extern unsafe int git_packbuilder_write(

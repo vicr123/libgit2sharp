@@ -9,7 +9,7 @@ namespace LibGit2Sharp.Core
         public int PackbuilderDegreeOfParallelism;
         public GitRemoteCallbacks RemoteCallbacks;
         public GitProxyOptions ProxyOptions;
-        public int FollowRedirects = 1 << 1;
+        public RemoteRedirectMode FollowRedirects = RemoteRedirectMode.Initial;
         public GitStrArrayManaged CustomHeaders;
     }
 }
