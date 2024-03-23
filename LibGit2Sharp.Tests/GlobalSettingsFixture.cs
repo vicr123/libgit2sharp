@@ -61,7 +61,7 @@ namespace LibGit2Sharp.Tests
         {
             Skip.IfNot(Platform.IsRunningOnNetFramework(), ".NET Framework only test.");
 
-            var nativeDllFileName = NativeDllName.Name + ".dll";
+            var nativeDllFileName = "notsupported" + ".dll";
             var testDir = Path.GetDirectoryName(typeof(GlobalSettingsFixture).Assembly.Location);
             var testAppExe = Path.Combine(testDir, $"NativeLibraryLoadTestApp.{architecture}.exe");
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -73,7 +73,7 @@ namespace LibGit2Sharp.Tests
                 Directory.CreateDirectory(platformDir);
                 File.Copy(Path.Combine(libraryPath, nativeDllFileName), Path.Combine(platformDir, nativeDllFileName));
 
-                var (output, exitCode) = ProcessHelper.RunProcess(testAppExe, arguments: $@"{NativeDllName.Name} ""{platformDir}""", workingDirectory: tempDir);
+                var (output, exitCode) = ProcessHelper.RunProcess(testAppExe, arguments: $@"notsupported ""{platformDir}""", workingDirectory: tempDir);
 
                 Assert.Empty(output);
                 Assert.Equal(0, exitCode);
