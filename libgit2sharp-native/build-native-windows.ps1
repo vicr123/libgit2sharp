@@ -12,6 +12,24 @@ if ($RID -notin @("win-x64", "win-x86", "win-arm64")) {
 
 Write-Host "Building $RID using Visual Studio generators (simpler than Ninja on Windows)"
 
+# Set up Visual Studio environment
+$vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+if (Test-Path $vsWhere) {
+    $vsPath = & $vsWhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+    if ($vsPath) {
+        $vcVarsPath = "$vsPath\VC\Auxiliary\Build\vcvars64.bat"
+        if (Test-Path $vcVarsPath) {
+            Write-Host "Setting up Visual Studio environment..."
+            # Import the VS environment into PowerShell
+            cmd /c "`"$vcVarsPath`" && set" | ForEach-Object {
+                if ($_ -match '^([^=]+)=(.*)$') {
+                    [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2])
+                }
+            }
+        }
+    }
+}
+
 $libssh2Src = "$PSScriptRoot\libssh2"
 $libgit2Src = "$PSScriptRoot\libgit2"
 $outputDir = "$PSScriptRoot\build-output\$RID"

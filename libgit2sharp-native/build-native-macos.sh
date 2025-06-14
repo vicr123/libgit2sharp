@@ -16,14 +16,15 @@ case "$RID" in
     echo "Unknown RID: $RID" >&2; exit 1 ;;
 esac
 
-LIBSSH2_SRC="$(dirname "$0")/libssh2"
-LIBGIT2_SRC="$(dirname "$0")/libgit2"
-OUTPUT_DIR="$(dirname "$0")/build-output/$RID"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LIBSSH2_SRC="$SCRIPT_DIR/libssh2"
+LIBGIT2_SRC="$SCRIPT_DIR/libgit2"
+OUTPUT_DIR="$SCRIPT_DIR/build-output/$RID"
 
 mkdir -p "$OUTPUT_DIR"
 
 # Create git info for libgit2
-cd "$(dirname "$0")/libgit2"
+cd "$LIBGIT2_SRC"
 LIBGIT2_SHA=$(git rev-parse HEAD)
 LIBGIT2_SHA_SHORT=$(echo $LIBGIT2_SHA | cut -c1-7)
 LIBGIT2_FILENAME="git2-$LIBGIT2_SHA_SHORT"

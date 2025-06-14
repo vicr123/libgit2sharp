@@ -8,7 +8,8 @@ RUN apk add --no-cache \
     git \
     pkgconfig \
     openssl-dev \
-    linux-headers
+    linux-headers \
+    bash
 
 WORKDIR /src
 
