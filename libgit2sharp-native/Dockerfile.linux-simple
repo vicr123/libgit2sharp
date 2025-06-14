@@ -1,6 +1,6 @@
-FROM ubuntu:22.04
+FROM mcr.microsoft.com/dotnet/sdk:8.0-noble
 
-# Install native build dependencies
+# Install build dependencies (PowerShell is already included in the base image)
 RUN apt-get update && \
     apt-get install -y \
         build-essential \
@@ -15,4 +15,4 @@ WORKDIR /src
 
 COPY . .
 
-ENTRYPOINT ["/src/libgit2sharp-native/build-native-linux.sh"]
+ENTRYPOINT ["pwsh", "/src/libgit2sharp-native/build-native.ps1"]

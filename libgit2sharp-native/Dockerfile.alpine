@@ -1,6 +1,6 @@
-FROM alpine:3.19
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine
 
-# Install build dependencies
+# Install build dependencies (PowerShell is already included in the base image)
 RUN apk add --no-cache \
     build-base \
     cmake \
@@ -8,11 +8,10 @@ RUN apk add --no-cache \
     git \
     pkgconfig \
     openssl-dev \
-    linux-headers \
-    bash
+    linux-headers
 
 WORKDIR /src
 
 COPY . .
 
-ENTRYPOINT ["/src/libgit2sharp-native/build-native-linux.sh"]
+ENTRYPOINT ["pwsh", "/src/libgit2sharp-native/build-native.ps1"]
