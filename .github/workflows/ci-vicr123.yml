@@ -101,26 +101,28 @@ jobs:
         with:
           name: native-linux-musl-x64
           path: libgit2sharp-native/build-output/linux-musl-x64
-  build-native-linux-musl-arm64:
-    name: Build Native Libraries (Linux musl ARM64)
-    runs-on: ubuntu-22.04-arm
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.2
-        with:
-          fetch-depth: 0
-          submodules: true
-      - name: Build native libraries
-        run: |
-          docker build -f libgit2sharp-native/Dockerfile.alpine -t nativebuild-musl .
-          docker run --rm \
-            -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
-            nativebuild-musl linux-musl-arm64
-      - name: Upload native artifacts
-        uses: actions/upload-artifact@v4.3.1
-        with:
-          name: native-linux-musl-arm64
-          path: libgit2sharp-native/build-output/linux-musl-arm64
+
+  # TODO: Uncomment when PowerShell support becomes available for Alpine Linux ARM64
+  # build-native-linux-musl-arm64:
+  #   name: Build Native Libraries (Linux musl ARM64)
+  #   runs-on: ubuntu-22.04-arm
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4.1.2
+  #       with:
+  #         fetch-depth: 0
+  #         submodules: true
+  #     - name: Build native libraries
+  #       run: |
+  #         docker build -f libgit2sharp-native/Dockerfile.alpine -t nativebuild-musl .
+  #         docker run --rm \
+  #           -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
+  #           nativebuild-musl linux-musl-arm64
+  #     - name: Upload native artifacts
+  #       uses: actions/upload-artifact@v4.3.1
+  #       with:
+  #         name: native-linux-musl-arm64
+  #         path: libgit2sharp-native/build-output/linux-musl-arm64
 
   build-native-windows:
     name: Build Native Libraries (Windows)
@@ -142,7 +144,6 @@ jobs:
         with:
           name: native-${{ matrix.rid }}
           path: libgit2sharp-native/build-output/${{ matrix.rid }}
-
   build-native-macos-arm64:
     name: Build Native Libraries (macOS ARM64)
     runs-on: macos-latest  # Apple Silicon runners
@@ -180,7 +181,7 @@ jobs:
   build-dotnet:
     name: Build and Pack .NET
     runs-on: ubuntu-22.04
-    needs: [build-native-linux-x64, build-native-linux-arm64, build-native-linux-arm, build-native-linux-musl-x64, build-native-linux-musl-arm64, build-native-windows, build-native-macos-arm64, build-native-macos-x64]
+    needs: [build-native-linux-x64, build-native-linux-arm64, build-native-linux-arm, build-native-linux-musl-x64, build-native-windows, build-native-macos-arm64, build-native-macos-x64] # TODO: Add build-native-linux-musl-arm64 when supported
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.2
