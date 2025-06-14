@@ -139,6 +139,7 @@ if ($IsWindows) {
         "-GNinja"
         "-DCMAKE_BUILD_TYPE=Release"
         "-DCRYPTO_BACKEND=OpenSSL"
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     )
 } elseif ($IsMacOS) {
     $libssh2Args += @(
@@ -148,6 +149,7 @@ if ($IsWindows) {
         "-DCMAKE_OSX_DEPLOYMENT_TARGET=$minVersion"
         "-DCRYPTO_BACKEND=OpenSSL"
         "-DOPENSSL_ROOT_DIR=$opensslRoot"
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     )
 }
 
@@ -184,6 +186,7 @@ if ($IsWindows) {
         "-GNinja"
         "-DCMAKE_BUILD_TYPE=Release"
         "-DUSE_HTTPS=OpenSSL"
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     )
 } elseif ($IsMacOS) {
     $libgit2Args += @(
@@ -195,6 +198,7 @@ if ($IsWindows) {
         "-DOpenSSL_ROOT=$opensslRoot"
         "-DCMAKE_EXE_LINKER_FLAGS=-L$opensslRoot/lib -lssl -lcrypto"
         "-DCMAKE_SHARED_LINKER_FLAGS=-L$opensslRoot/lib -lssl -lcrypto"
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     )
 }
 

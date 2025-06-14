@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0-noble
+FROM mcr.microsoft.com/dotnet/sdk:9.0-noble
 
 # Install build dependencies (PowerShell is already included in the base image)
 RUN apt-get update && \
