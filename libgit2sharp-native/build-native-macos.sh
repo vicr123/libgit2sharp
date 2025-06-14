@@ -29,28 +29,16 @@ LIBGIT2_SHA=$(git rev-parse HEAD)
 LIBGIT2_SHA_SHORT=$(echo $LIBGIT2_SHA | cut -c1-7)
 LIBGIT2_FILENAME="git2-$LIBGIT2_SHA_SHORT"
 
-echo "Building $RID for architecture $ARCH"
+echo "Building $RID for architecture $ARCH (native compilation)"
 
 # Get macOS SDK path
 MACOS_SDK_PATH=$(xcrun --show-sdk-path)
 echo "Using macOS SDK: $MACOS_SDK_PATH"
 
-# Install OpenSSL for both architectures to ensure cross-compilation works
-echo "Setting up OpenSSL for cross-compilation..."
-
-# Install x86_64 OpenSSL via Rosetta (needed for x86_64 builds on Apple Silicon)
-arch -x86_64 brew install openssl@3 2>/dev/null || true
-
-# Also ensure native OpenSSL is available
-brew install openssl@3 2>/dev/null || true
-
-# Use the appropriate OpenSSL path based on target architecture
-if [[ "$ARCH" == "x86_64" ]]; then
-    OPENSSL_ROOT_DIR="/usr/local/opt/openssl@3"
-else
-    OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
-fi
-
+# Install and use Homebrew OpenSSL
+echo "Installing OpenSSL@3 via Homebrew..."
+brew install openssl@3
+OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
 echo "Using OpenSSL at: $OPENSSL_ROOT_DIR"
 
 # Build libssh2
@@ -85,8 +73,7 @@ cmake "$LIBGIT2_SRC" \
     -DCMAKE_OSX_DEPLOYMENT_TARGET="$MIN_VERSION" \
     -DCMAKE_OSX_SYSROOT="$MACOS_SDK_PATH" \
     -DBUILD_TESTS=OFF \
-    -DBUILD_CLI=OFF \
-    -DUSE_SSH=libssh2 \
+    -DBUILD_CLI=OFF \    -DUSE_SSH=libssh2 \
     -DUSE_HTTPS=SecureTransport \
     -DLibSSH2_DIR="$INSTALL_DIR" \
     -DLIBSSH2_INCLUDE_DIR="$INSTALL_DIR/include" \

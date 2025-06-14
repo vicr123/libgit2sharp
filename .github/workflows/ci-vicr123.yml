@@ -143,30 +143,43 @@ jobs:
         with:
           name: native-${{ matrix.rid }}
           path: libgit2sharp-native/build-output/${{ matrix.rid }}
-
-  build-native-macos:
-    name: Build Native Libraries (macOS)
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        rid: [osx-x64, osx-arm64]
+  build-native-macos-arm64:
+    name: Build Native Libraries (macOS ARM64)
+    runs-on: macos-latest  # Apple Silicon runners
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.2
         with:
           fetch-depth: 0
           submodules: true
-      - name: Build native libraries (${{ matrix.rid }})
-        run: ./libgit2sharp-native/build-native-macos.sh ${{ matrix.rid }}
+      - name: Build native libraries (osx-arm64)
+        run: ./libgit2sharp-native/build-native-macos.sh osx-arm64
       - name: Upload native artifacts
         uses: actions/upload-artifact@v4.3.1
         with:
-          name: native-${{ matrix.rid }}
-          path: libgit2sharp-native/build-output/${{ matrix.rid }}
+          name: native-osx-arm64
+          path: libgit2sharp-native/build-output/osx-arm64
+
+  build-native-macos-x64:
+    name: Build Native Libraries (macOS x64)
+    runs-on: macos-13  # Intel runners
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Build native libraries (osx-x64)
+        run: ./libgit2sharp-native/build-native-macos.sh osx-x64
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: native-osx-x64
+          path: libgit2sharp-native/build-output/osx-x64
   build-dotnet:
     name: Build and Pack .NET
     runs-on: ubuntu-22.04
-    needs: [build-native-linux-x64, build-native-linux-arm64, build-native-linux-arm, build-native-linux-musl-x64, build-native-linux-musl-arm64, build-native-windows, build-native-macos]
+    needs: [build-native-linux-x64, build-native-linux-arm64, build-native-linux-arm, build-native-linux-musl-x64, build-native-linux-musl-arm64, build-native-windows, build-native-macos-arm64, build-native-macos-x64]
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.2
