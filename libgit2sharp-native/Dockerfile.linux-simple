@@ -15,4 +15,7 @@ WORKDIR /src
 
 COPY . .
 
+# Make the build script executable
+RUN chmod +x /src/libgit2sharp-native/build-native-linux.sh
+
 ENTRYPOINT ["/src/libgit2sharp-native/build-native-linux.sh"]
