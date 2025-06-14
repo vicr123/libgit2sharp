@@ -56,8 +56,9 @@ if ($IsWindows) {
         "win-x86"   { "x86" }
         "win-arm64" { "arm64" }
     }
-      $launchVsDevShellPath = "$vsPath\Common7\Tools\Launch-VsDevShell.ps1"
-    & $launchVsDevShellPath -Arch $targetArch
+    
+    $launchVsDevShellPath = "$vsPath\Common7\Tools\Launch-VsDevShell.ps1"
+    & $launchVsDevShellPath -Arch $targetArch -HostArch amd64
     
     $buildRoot = Join-Path $PSScriptRoot "build-$RID"
     $installDir = Join-Path $buildRoot "install"
