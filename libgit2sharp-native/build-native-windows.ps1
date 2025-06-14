@@ -12,23 +12,24 @@ if ($RID -notin @("win-x64", "win-x86", "win-arm64")) {
 
 Write-Host "Building $RID using Visual Studio generators (simpler than Ninja on Windows)"
 
-# Set up Visual Studio environment
+# Set up Visual Studio environment using Launch-VsDevShell.ps1
+Write-Host "Setting up Visual Studio environment..."
+
+# Use vswhere to find the latest Visual Studio installation
 $vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-if (Test-Path $vsWhere) {
-    $vsPath = & $vsWhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-    if ($vsPath) {
-        $vcVarsPath = "$vsPath\VC\Auxiliary\Build\vcvars64.bat"
-        if (Test-Path $vcVarsPath) {
-            Write-Host "Setting up Visual Studio environment..."
-            # Import the VS environment into PowerShell
-            cmd /c "`"$vcVarsPath`" && set" | ForEach-Object {
-                if ($_ -match '^([^=]+)=(.*)$') {
-                    [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2])
-                }
-            }
-        }
-    }
+$vsPath = & $vsWhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+
+# Map RID to architecture parameters
+$targetArch = switch ($RID) {
+    "win-x64"   { "amd64" }
+    "win-x86"   { "x86" }
+    "win-arm64" { "arm64" }
 }
+
+$launchVsDevShellPath = "$vsPath\Common7\Tools\Launch-VsDevShell.ps1"
+& $launchVsDevShellPath -Arch $targetArch
+
+Write-Host "Visual Studio environment configured for $targetArch"
 
 $libssh2Src = "$PSScriptRoot\libssh2"
 $libgit2Src = "$PSScriptRoot\libgit2"
@@ -88,6 +89,7 @@ cmake $libgit2Src `
     -A $arch `
     -DBUILD_TESTS=OFF `
     -DBUILD_CLI=OFF `
+    -DSTATIC_CRT=OFF `
     -DCMAKE_INSTALL_PREFIX="$installDir" `
     -DLibSSH2_DIR="$installDir" `
     @libgit2Args
