@@ -1,0 +1,153 @@
+name: CI
+on:
+  push:
+    branches: [ssh-vicr123]
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-*'
+  pull_request:
+  workflow_dispatch:
+env:
+  DOTNET_NOLOGO: true
+jobs:
+  build-native-linux:
+    name: Build Native Libraries (Linux glibc)
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - rid: linux-x64
+            platform: linux/amd64
+          - rid: linux-arm64
+            platform: linux/arm64
+          - rid: linux-arm
+            platform: linux/arm/v7
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build native libraries (${{ matrix.rid }})
+        run: |
+          docker buildx build \
+            --platform ${{ matrix.platform }} \
+            -f libgit2sharp-native/Dockerfile.linux-simple \
+            --load \
+            -t nativebuild:${{ matrix.rid }} .
+          docker run --rm --platform ${{ matrix.platform }} \
+            -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
+            nativebuild:${{ matrix.rid }} ${{ matrix.rid }}
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: native-${{ matrix.rid }}
+          path: libgit2sharp-native/build-output/${{ matrix.rid }}
+  build-native-linux-musl:
+    name: Build Native Libraries (Linux musl)
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - rid: linux-musl-x64
+            platform: linux/amd64
+          - rid: linux-musl-arm64  
+            platform: linux/arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build native libraries (${{ matrix.rid }})
+        run: |
+          docker buildx build \
+            --platform ${{ matrix.platform }} \
+            -f libgit2sharp-native/Dockerfile.alpine \
+            --load \
+            -t nativebuild-musl:${{ matrix.rid }} .
+          docker run --rm --platform ${{ matrix.platform }} \
+            -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
+            nativebuild-musl:${{ matrix.rid }} ${{ matrix.rid }}
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: native-${{ matrix.rid }}
+          path: libgit2sharp-native/build-output/${{ matrix.rid }}
+
+  build-native-windows:
+    name: Build Native Libraries (Windows)
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        rid: [win-x64, win-x86, win-arm64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+      - name: Build native libraries (${{ matrix.rid }})
+        shell: pwsh
+        run: ./libgit2sharp-native/build-native-windows.ps1 ${{ matrix.rid }}
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: native-${{ matrix.rid }}
+          path: libgit2sharp-native/build-output/${{ matrix.rid }}
+  build-native-macos:
+    name: Build Native Libraries (macOS)
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        rid: [osx-x64, osx-arm64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+      - name: Install OpenSSL 3
+        run: |
+          brew install openssl@3
+          echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> $GITHUB_ENV
+      - name: Build native libraries (${{ matrix.rid }})
+        run: ./libgit2sharp-native/build-native-macos.sh ${{ matrix.rid }}
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: native-${{ matrix.rid }}
+          path: libgit2sharp-native/build-output/${{ matrix.rid }}
+  build-dotnet:
+    name: Build and Pack .NET
+    runs-on: ubuntu-22.04
+    needs: [build-native-linux, build-native-linux-musl, build-native-windows, build-native-macos]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4.0.0
+        with:
+          dotnet-version: 9.0.x
+      - name: Download native artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: libgit2sharp-native/build-output
+      - name: Move native outputs to correct structure
+        run: |
+          for d in libgit2sharp-native/build-output/native-*; do
+            rid=$(basename "$d" | sed 's/native-//')
+            mkdir -p "libgit2sharp-native/build-output/$rid"
+            mv "$d"/* "libgit2sharp-native/build-output/$rid/" || true
+            rmdir "$d" || true
+          done
+      - name: Pack LibGit2Sharp
+        run: dotnet pack LibGit2Sharp/LibGit2Sharp.csproj --configuration Release --output artifacts/package
+      - name: Upload packages
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: NuGet packages
+          path: artifacts/package/
+          retention-days: 7

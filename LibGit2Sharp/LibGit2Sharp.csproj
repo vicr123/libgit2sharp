@@ -22,6 +22,9 @@
     <PackageOutputPath>$(ArtifactsPath)\package</PackageOutputPath>
     <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
     <MinVerBuildMetadata Condition="'$(libgit2_hash)' != ''">libgit2-$(libgit2_hash.Substring(0,7))</MinVerBuildMetadata>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <PackageId>libgit2sharp-native</PackageId>
     <RepositoryUrl>https://github.com/vicr123/libgit2sharp</RepositoryUrl>
   </PropertyGroup>
@@ -31,7 +34,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="[2.0.323]" PrivateAssets="none" />
     <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="all" />
   </ItemGroup>
 
@@ -43,6 +45,18 @@
     <None Update="Core\Handles\Objects.tt" Generator="TextTemplatingFileGenerator" LastGenOutput="Objects.cs" />
     <Compile Update="Core\Handles\Objects.cs" DependentUpon="Objects.tt" DesignTime="True" AutoGen="True" />
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" /> <!-- Needed for T4 generation -->
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\libgit2sharp-native\build-output\win-x64\*.dll" Pack="true" PackagePath="runtimes/win-x64/native/" />
+    <None Include="..\libgit2sharp-native\build-output\win-x86\*.dll" Pack="true" PackagePath="runtimes/win-x86/native/" />
+    <None Include="..\libgit2sharp-native\build-output\win-arm64\*.dll" Pack="true" PackagePath="runtimes/win-arm64/native/" />
+    <None Include="..\libgit2sharp-native\build-output\linux-x64\*.so*" Pack="true" PackagePath="runtimes/linux-x64/native/" />
+    <None Include="..\libgit2sharp-native\build-output\linux-arm64\*.so*" Pack="true" PackagePath="runtimes/linux-arm64/native/" />
+    <None Include="..\libgit2sharp-native\build-output\linux-arm\*.so*" Pack="true" PackagePath="runtimes/linux-arm/native/" />
+    <None Include="..\libgit2sharp-native\build-output\linux-musl-x64\*.so*" Pack="true" PackagePath="runtimes/linux-musl-x64/native/" />
+    <None Include="..\libgit2sharp-native\build-output\linux-musl-arm64\*.so*" Pack="true" PackagePath="runtimes/linux-musl-arm64/native/" />
+    <None Include="..\libgit2sharp-native\build-output\osx-x64\*.dylib" Pack="true" PackagePath="runtimes/osx-x64/native/" />
+    <None Include="..\libgit2sharp-native\build-output\osx-arm64\*.dylib" Pack="true" PackagePath="runtimes/osx-arm64/native/" />
   </ItemGroup>
 
   <Import Project="..\Targets\CodeGenerator.targets" />

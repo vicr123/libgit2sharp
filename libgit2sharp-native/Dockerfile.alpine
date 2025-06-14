@@ -1,0 +1,17 @@
+FROM alpine:3.19
+
+# Install build dependencies
+RUN apk add --no-cache \
+    build-base \
+    cmake \
+    ninja \
+    git \
+    pkgconfig \
+    openssl-dev \
+    linux-headers
+
+WORKDIR /src
+
+COPY . .
+
+ENTRYPOINT ["/src/libgit2sharp-native/build-native-linux.sh"]
