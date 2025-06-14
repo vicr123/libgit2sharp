@@ -35,6 +35,10 @@ echo "Building $RID for architecture $ARCH"
 MACOS_SDK_PATH=$(xcrun --show-sdk-path)
 echo "Using macOS SDK: $MACOS_SDK_PATH"
 
+# Set up OpenSSL
+OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+echo "Using OpenSSL at: $OPENSSL_ROOT_DIR"
+
 # Build libssh2
 LIBSSH2_BUILD="/tmp/build-libssh2-$RID"
 INSTALL_DIR="/tmp/install-libssh2-$RID"
@@ -73,7 +77,11 @@ cmake "$LIBGIT2_SRC" \
     -DLibSSH2_DIR="$INSTALL_DIR" \
     -DLIBSSH2_INCLUDE_DIR="$INSTALL_DIR/include" \
     -DLIBSSH2_LIBRARY="$INSTALL_DIR/lib/libssh2.a" \
-    -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+    -DOPENSSL_ROOT_DIR="$OPENSSL_ROOT_DIR" \
+    -DOPENSSL_INCLUDE_DIR="$OPENSSL_ROOT_DIR/include" \
+    -DOPENSSL_CRYPTO_LIBRARY="$OPENSSL_ROOT_DIR/lib/libcrypto.a" \
+    -DOPENSSL_SSL_LIBRARY="$OPENSSL_ROOT_DIR/lib/libssl.a" \
+    -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR;$OPENSSL_ROOT_DIR" \
     -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH \
     -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH \
     -DCMAKE_FRAMEWORK_PATH="$MACOS_SDK_PATH/System/Library/Frameworks" \
