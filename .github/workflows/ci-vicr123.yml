@@ -27,6 +27,7 @@ jobs:
         uses: actions/checkout@v4.1.2
         with:
           fetch-depth: 0
+          submodules: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build native libraries (${{ matrix.rid }})
@@ -59,6 +60,7 @@ jobs:
         uses: actions/checkout@v4.1.2
         with:
           fetch-depth: 0
+          submodules: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build native libraries (${{ matrix.rid }})
@@ -88,6 +90,7 @@ jobs:
         uses: actions/checkout@v4.1.2
         with:
           fetch-depth: 0
+          submodules: true
       - name: Build native libraries (${{ matrix.rid }})
         shell: pwsh
         run: ./libgit2sharp-native/build-native-windows.ps1 ${{ matrix.rid }}
@@ -107,6 +110,7 @@ jobs:
         uses: actions/checkout@v4.1.2
         with:
           fetch-depth: 0
+          submodules: true
       - name: Install OpenSSL 3
         run: |
           brew install openssl@3
