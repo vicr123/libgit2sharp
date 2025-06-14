@@ -10,76 +10,118 @@ on:
 env:
   DOTNET_NOLOGO: true
 jobs:
-  build-native-linux:
-    name: Build Native Libraries (Linux glibc)
+  build-native-linux-x64:
+    name: Build Native Libraries (Linux x64)
     runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        include:
-          - rid: linux-x64
-            platform: linux/amd64
-          - rid: linux-arm64
-            platform: linux/arm64
-          - rid: linux-arm
-            platform: linux/arm/v7
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.2
         with:
           fetch-depth: 0
           submodules: true
+      - name: Build native libraries
+        run: |
+          docker build -f libgit2sharp-native/Dockerfile.linux-simple -t nativebuild .
+          docker run --rm \
+            -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
+            nativebuild linux-x64
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: native-linux-x64
+          path: libgit2sharp-native/build-output/linux-x64
+
+  build-native-linux-arm64:
+    name: Build Native Libraries (Linux ARM64)
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Build native libraries
+        run: |
+          docker build -f libgit2sharp-native/Dockerfile.linux-simple -t nativebuild .
+          docker run --rm \
+            -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
+            nativebuild linux-arm64
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: native-linux-arm64
+          path: libgit2sharp-native/build-output/linux-arm64
+
+  build-native-linux-arm:
+    name: Build Native Libraries (Linux ARM)
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Set up QEMU (for armv7)
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Build native libraries (${{ matrix.rid }})
+      - name: Build native libraries
         run: |
           docker buildx build \
-            --platform ${{ matrix.platform }} \
+            --platform linux/arm/v7 \
             -f libgit2sharp-native/Dockerfile.linux-simple \
             --load \
-            -t nativebuild:${{ matrix.rid }} .
-          docker run --rm --platform ${{ matrix.platform }} \
+            -t nativebuild .
+          docker run --rm --platform linux/arm/v7 \
             -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
-            nativebuild:${{ matrix.rid }} ${{ matrix.rid }}
+            nativebuild linux-arm
       - name: Upload native artifacts
         uses: actions/upload-artifact@v4.3.1
         with:
-          name: native-${{ matrix.rid }}
-          path: libgit2sharp-native/build-output/${{ matrix.rid }}
-  build-native-linux-musl:
-    name: Build Native Libraries (Linux musl)
+          name: native-linux-arm
+          path: libgit2sharp-native/build-output/linux-arm
+
+  build-native-linux-musl-x64:
+    name: Build Native Libraries (Linux musl x64)
     runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        include:
-          - rid: linux-musl-x64
-            platform: linux/amd64
-          - rid: linux-musl-arm64  
-            platform: linux/arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.2
         with:
           fetch-depth: 0
           submodules: true
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build native libraries (${{ matrix.rid }})
+      - name: Build native libraries
         run: |
-          docker buildx build \
-            --platform ${{ matrix.platform }} \
-            -f libgit2sharp-native/Dockerfile.alpine \
-            --load \
-            -t nativebuild-musl:${{ matrix.rid }} .
-          docker run --rm --platform ${{ matrix.platform }} \
+          docker build -f libgit2sharp-native/Dockerfile.alpine -t nativebuild-musl .
+          docker run --rm \
             -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
-            nativebuild-musl:${{ matrix.rid }} ${{ matrix.rid }}
+            nativebuild-musl linux-musl-x64
       - name: Upload native artifacts
         uses: actions/upload-artifact@v4.3.1
         with:
-          name: native-${{ matrix.rid }}
-          path: libgit2sharp-native/build-output/${{ matrix.rid }}
+          name: native-linux-musl-x64
+          path: libgit2sharp-native/build-output/linux-musl-x64
+
+  build-native-linux-musl-arm64:
+    name: Build Native Libraries (Linux musl ARM64)
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Build native libraries
+        run: |
+          docker build -f libgit2sharp-native/Dockerfile.alpine -t nativebuild-musl .
+          docker run --rm \
+            -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
+            nativebuild-musl linux-musl-arm64
+      - name: Upload native artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: native-linux-musl-arm64
+          path: libgit2sharp-native/build-output/linux-musl-arm64
 
   build-native-windows:
     name: Build Native Libraries (Windows)
@@ -127,7 +169,7 @@ jobs:
   build-dotnet:
     name: Build and Pack .NET
     runs-on: ubuntu-22.04
-    needs: [build-native-linux, build-native-linux-musl, build-native-windows, build-native-macos]
+    needs: [build-native-linux-x64, build-native-linux-arm64, build-native-linux-arm, build-native-linux-musl-x64, build-native-linux-musl-arm64, build-native-windows, build-native-macos]
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.2
