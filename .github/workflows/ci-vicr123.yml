@@ -187,6 +187,10 @@ jobs:
         uses: actions/checkout@v4.1.2
         with:
           fetch-depth: 0
+          submodules: true
+      - name: Generate libgit2 props file
+        shell: pwsh
+        run: ./libgit2sharp-native/generate-libgit2-props.ps1
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4.0.0
         with:
@@ -204,7 +208,7 @@ jobs:
             rmdir "$d" || true
           done
       - name: Pack LibGit2Sharp
-        run: dotnet pack LibGit2Sharp/LibGit2Sharp.csproj --configuration Release --output artifacts/package
+        run: dotnet build LibGit2Sharp/LibGit2Sharp.csproj --configuration Release --output artifacts/package
       - name: Upload packages
         uses: actions/upload-artifact@v4.3.1
         with:

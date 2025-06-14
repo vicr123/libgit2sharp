@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\libgit2sharp-native\libgit2.generated.props" />
 
   <PropertyGroup>
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
@@ -46,6 +47,7 @@
     <Compile Update="Core\Handles\Objects.cs" DependentUpon="Objects.tt" DesignTime="True" AutoGen="True" />
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" /> <!-- Needed for T4 generation -->
   </ItemGroup>
+  
   <ItemGroup>
     <None Include="..\libgit2sharp-native\build-output\win-x64\*.dll" Pack="true" PackagePath="runtimes/win-x64/native/" />
     <None Include="..\libgit2sharp-native\build-output\win-x86\*.dll" Pack="true" PackagePath="runtimes/win-x86/native/" />
