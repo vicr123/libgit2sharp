@@ -30,6 +30,8 @@ jobs:
           submodules: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Build native libraries (${{ matrix.rid }})
         run: |
           docker buildx build \
