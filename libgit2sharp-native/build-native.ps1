@@ -56,15 +56,8 @@ if ($IsWindows) {
         "win-x86"   { "x86" }
         "win-arm64" { "arm64" }
     }
-    
-    $launchVsDevShellPath = "$vsPath\Common7\Tools\Launch-VsDevShell.ps1"
-    & $launchVsDevShellPath -Arch $targetArch -HostArch amd64
-    
-    $cmakeArch = switch ($RID) {
-        "win-x64"   { "x64" }
-        "win-x86"   { "Win32" }
-        "win-arm64" { "ARM64" }
-    }
+      $launchVsDevShellPath = "$vsPath\Common7\Tools\Launch-VsDevShell.ps1"
+    & $launchVsDevShellPath -Arch $targetArch
     
     $buildRoot = Join-Path $PSScriptRoot "build-$RID"
     $installDir = Join-Path $buildRoot "install"
@@ -122,6 +115,8 @@ Push-Location $libssh2Build
 # Common libssh2 arguments
 $libssh2Args = @(
     $libssh2Src
+    "-GNinja"
+    "-DCMAKE_BUILD_TYPE=Release"
     "-DBUILD_SHARED_LIBS=OFF"
     "-DBUILD_EXAMPLES=OFF" 
     "-DBUILD_TESTING=OFF"
@@ -131,20 +126,15 @@ $libssh2Args = @(
 # Platform-specific libssh2 arguments
 if ($IsWindows) {
     $libssh2Args += @(
-        "-A", $cmakeArch
         "-DCRYPTO_BACKEND=WinCNG"
     )
 } elseif ($IsLinux) {
     $libssh2Args += @(
-        "-GNinja"
-        "-DCMAKE_BUILD_TYPE=Release"
         "-DCRYPTO_BACKEND=OpenSSL"
         "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     )
 } elseif ($IsMacOS) {
     $libssh2Args += @(
-        "-GNinja"
-        "-DCMAKE_BUILD_TYPE=Release"
         "-DCMAKE_OSX_ARCHITECTURES=$arch"
         "-DCMAKE_OSX_DEPLOYMENT_TARGET=$minVersion"
         "-DCRYPTO_BACKEND=OpenSSL"
@@ -154,7 +144,7 @@ if ($IsWindows) {
 }
 
 cmake @libssh2Args
-cmake --build . --config Release --target install
+cmake --build . --target install
 Pop-Location
 
 # Build libgit2
@@ -166,32 +156,28 @@ Push-Location $libgit2Build
 # Common libgit2 arguments
 $libgit2Args = @(
     $libgit2Src
+    "-GNinja"
+    "-DCMAKE_BUILD_TYPE=Release"
     "-DBUILD_TESTS=OFF"
     "-DBUILD_CLI=OFF"
     "-DUSE_SSH=libssh2"
     "-DLIBGIT2_FILENAME=$libgit2Filename"
     "-DCMAKE_INSTALL_PREFIX=$installDir"
-    "-DLibSSH2_DIR=$installDir"
 )
 
 # Platform-specific libgit2 arguments
 if ($IsWindows) {
     $libgit2Args += @(
-        "-A", $cmakeArch
         "-DSTATIC_CRT=OFF"
         "-DUSE_HTTPS=Schannel"
     )
 } elseif ($IsLinux) {
     $libgit2Args += @(
-        "-GNinja"
-        "-DCMAKE_BUILD_TYPE=Release"
         "-DUSE_HTTPS=OpenSSL"
         "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
     )
 } elseif ($IsMacOS) {
     $libgit2Args += @(
-        "-GNinja"
-        "-DCMAKE_BUILD_TYPE=Release"
         "-DCMAKE_OSX_ARCHITECTURES=$arch"
         "-DCMAKE_OSX_DEPLOYMENT_TARGET=$minVersion"
         "-DUSE_HTTPS=SecureTransport"
@@ -203,7 +189,7 @@ if ($IsWindows) {
 }
 
 cmake @libgit2Args
-cmake --build . --config Release --target install
+cmake --build . --target install
 Pop-Location
 
 # Copy build artifacts
