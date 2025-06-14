@@ -35,9 +35,23 @@ echo "Building $RID for architecture $ARCH"
 MACOS_SDK_PATH=$(xcrun --show-sdk-path)
 echo "Using macOS SDK: $MACOS_SDK_PATH"
 
-# Use Homebrew OpenSSL (let the system handle architecture at runtime)
-OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
-echo "Using Homebrew OpenSSL at: $OPENSSL_ROOT_DIR"
+# Install OpenSSL for both architectures to ensure cross-compilation works
+echo "Setting up OpenSSL for cross-compilation..."
+
+# Install x86_64 OpenSSL via Rosetta (needed for x86_64 builds on Apple Silicon)
+arch -x86_64 brew install openssl@3 2>/dev/null || true
+
+# Also ensure native OpenSSL is available
+brew install openssl@3 2>/dev/null || true
+
+# Use the appropriate OpenSSL path based on target architecture
+if [[ "$ARCH" == "x86_64" ]]; then
+    OPENSSL_ROOT_DIR="/usr/local/opt/openssl@3"
+else
+    OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+fi
+
+echo "Using OpenSSL at: $OPENSSL_ROOT_DIR"
 
 # Build libssh2
 LIBSSH2_BUILD="/tmp/build-libssh2-$RID"
