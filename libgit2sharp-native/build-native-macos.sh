@@ -31,6 +31,10 @@ LIBGIT2_FILENAME="git2-$LIBGIT2_SHA_SHORT"
 
 echo "Building $RID for architecture $ARCH"
 
+# Get macOS SDK path
+MACOS_SDK_PATH=$(xcrun --show-sdk-path)
+echo "Using macOS SDK: $MACOS_SDK_PATH"
+
 # Build libssh2
 LIBSSH2_BUILD="/tmp/build-libssh2-$RID"
 INSTALL_DIR="/tmp/install-libssh2-$RID"
@@ -61,6 +65,7 @@ cmake "$LIBGIT2_SRC" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_OSX_ARCHITECTURES="$ARCH" \
     -DCMAKE_OSX_DEPLOYMENT_TARGET="$MIN_VERSION" \
+    -DCMAKE_OSX_SYSROOT="$MACOS_SDK_PATH" \
     -DBUILD_TESTS=OFF \
     -DBUILD_CLI=OFF \
     -DUSE_SSH=libssh2 \
@@ -71,6 +76,7 @@ cmake "$LIBGIT2_SRC" \
     -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
     -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
     -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+    -DCMAKE_FRAMEWORK_PATH="$MACOS_SDK_PATH/System/Library/Frameworks" \
     -DLIBGIT2_FILENAME="$LIBGIT2_FILENAME" \
     -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
 
