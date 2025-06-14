@@ -55,7 +55,6 @@ $buildRoot = "$PSScriptRoot\build-$RID"
 $installDir = "$buildRoot\install"
 
 # Windows-specific build settings
-$env:RC = "rc.exe"
 $libgit2Args = @(
     '-DUSE_HTTPS=Schannel'
     '-DUSE_SSH=libssh2'
