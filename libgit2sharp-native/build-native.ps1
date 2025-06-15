@@ -193,27 +193,16 @@ Pop-Location
 # Copy build artifacts
 Write-Host "Copying library to output directory..."
 
-# Determine library extension and source path
+# Determine source path based on platform
 if ($IsWindows) {
-    $libraryExtension = "dll"
-    $sourceDir = "$installDir\bin"
+    $sourcePath = Join-Path "$installDir\bin" "$libgit2Filename.dll"
 } elseif ($IsLinux) {
-    $libraryExtension = "so"
-    $sourceDir = "$installDir/lib"
+    $sourcePath = Join-Path "$installDir/lib" "lib$libgit2Filename.so"
 } elseif ($IsMacOS) {
-    $libraryExtension = "dylib"
-    $sourceDir = "$installDir/lib"
+    $sourcePath = Join-Path "$installDir/lib" "lib$libgit2Filename.dylib"
 }
-
-$expectedFilename = "$libgit2Filename.$libraryExtension"
-$sourcePath = Join-Path $sourceDir $expectedFilename
 
 Write-Host "Copying $sourcePath to $outputDir"
 Copy-Item -Path $sourcePath -Destination $outputDir -Force
 
 Write-Host "Build completed for $RID"
-if (Test-Path $outputDir) {
-    Get-ChildItem $outputDir
-} else {
-    Write-Warning "Output directory not found: $outputDir"
-}
