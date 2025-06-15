@@ -164,6 +164,7 @@ $libgit2Args = @(
     "-DUSE_SSH=libssh2"
     "-DLIBGIT2_FILENAME=$libgit2Filename"
     "-DCMAKE_INSTALL_PREFIX=$installDir"
+    "-DSONAME=OFF"
 )
 
 # Platform-specific libgit2 arguments
