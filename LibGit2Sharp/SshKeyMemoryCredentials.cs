@@ -8,6 +8,7 @@ namespace LibGit2Sharp
     /// </summary>
     public sealed class SshKeyMemoryCredentials : Credentials
     {
+        // <inheritdoc />
         protected internal override int GitCredentialHandler(out IntPtr cred)
         {
             if (Username == null || PublicKey == null || PrivateKey == null)
