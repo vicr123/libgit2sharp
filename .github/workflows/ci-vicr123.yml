@@ -21,7 +21,7 @@ jobs:
           submodules: true
       - name: Build native libraries
         run: |
-          docker build -f libgit2sharp-native/Dockerfile.linux-simple -t nativebuild .
+          docker build -f libgit2sharp-native/Dockerfile.linux -t nativebuild .
           docker run --rm \
             -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
             nativebuild linux-x64
@@ -42,7 +42,7 @@ jobs:
           submodules: true
       - name: Build native libraries
         run: |
-          docker build -f libgit2sharp-native/Dockerfile.linux-simple -t nativebuild .
+          docker build -f libgit2sharp-native/Dockerfile.linux -t nativebuild .
           docker run --rm \
             -v ${{ github.workspace }}/libgit2sharp-native/build-output:/src/libgit2sharp-native/build-output \
             nativebuild linux-arm64
@@ -69,7 +69,7 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/arm/v7 \
-            -f libgit2sharp-native/Dockerfile.linux-simple \
+            -f libgit2sharp-native/Dockerfile.linux \
             --load \
             -t nativebuild .
           docker run --rm --platform linux/arm/v7 \
