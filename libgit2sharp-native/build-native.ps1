@@ -62,7 +62,6 @@ if ($IsWindows) {
     
     $buildRoot = Join-Path $PSScriptRoot "build-$RID"
     $installDir = Join-Path $buildRoot "install"
-    $filePattern = "*.dll"
     
 } elseif ($IsLinux) {
     $isMusl = $RID -like "*musl*"
@@ -78,7 +77,6 @@ if ($IsWindows) {
     
     $buildRoot = "/tmp/build-$RID"
     $installDir = "/tmp/install-$RID"
-    $filePattern = "*.so*"
     
 } elseif ($IsMacOS) {
     $arch = switch ($RID) {
@@ -100,7 +98,6 @@ if ($IsWindows) {
     
     $buildRoot = "/tmp/build-$RID"
     $installDir = "/tmp/install-$RID"
-    $filePattern = "*.dylib"
 }
 
 # Create build directories
@@ -164,7 +161,6 @@ $libgit2Args = @(
     "-DUSE_SSH=libssh2"
     "-DLIBGIT2_FILENAME=$libgit2Filename"
     "-DCMAKE_INSTALL_PREFIX=$installDir"
-    "-DSONAME=OFF"
 )
 
 # Platform-specific libgit2 arguments
@@ -195,17 +191,25 @@ cmake --build . --target install
 Pop-Location
 
 # Copy build artifacts
-Write-Host "Copying libraries to output directory..."
-$searchDirs = @("$installDir/lib", "$installDir/bin")
+Write-Host "Copying library to output directory..."
+
+# Determine library extension and source path
 if ($IsWindows) {
-    $searchDirs = @("$installDir\lib", "$installDir\bin")
+    $libraryExtension = "dll"
+    $sourceDir = "$installDir\bin"
+} elseif ($IsLinux) {
+    $libraryExtension = "so"
+    $sourceDir = "$installDir/lib"
+} elseif ($IsMacOS) {
+    $libraryExtension = "dylib"
+    $sourceDir = "$installDir/lib"
 }
 
-foreach ($dir in $searchDirs) {
-    if (Test-Path $dir) {
-        Get-ChildItem -Path $dir -Filter $filePattern | Copy-Item -Destination $outputDir -Force
-    }
-}
+$expectedFilename = "$libgit2Filename.$libraryExtension"
+$sourcePath = Join-Path $sourceDir $expectedFilename
+
+Write-Host "Copying $sourcePath to $outputDir"
+Copy-Item -Path $sourcePath -Destination $outputDir -Force
 
 Write-Host "Build completed for $RID"
 if (Test-Path $outputDir) {
