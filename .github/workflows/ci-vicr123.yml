@@ -161,27 +161,10 @@ jobs:
         with:
           name: native-osx-arm64
           path: libgit2sharp-native/build-output/osx-arm64
-  build-native-macos-x64:
-    name: Build Native Libraries (macOS x64)
-    runs-on: macos-13  # Intel runners
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.2
-        with:
-          fetch-depth: 0
-          submodules: true
-      - name: Build native libraries (osx-x64)
-        shell: pwsh
-        run: ./libgit2sharp-native/build-native.ps1 osx-x64
-      - name: Upload native artifacts
-        uses: actions/upload-artifact@v4.3.1
-        with:
-          name: native-osx-x64
-          path: libgit2sharp-native/build-output/osx-x64
   build-dotnet:
     name: Build and Pack .NET
     runs-on: ubuntu-22.04
-    needs: [build-native-linux-x64, build-native-linux-arm64, build-native-linux-arm, build-native-linux-musl-x64, build-native-windows, build-native-macos-arm64, build-native-macos-x64] # TODO: Add build-native-linux-musl-arm64 when supported
+    needs: [build-native-linux-x64, build-native-linux-arm64, build-native-linux-arm, build-native-linux-musl-x64, build-native-windows, build-native-macos-arm64] # TODO: Add build-native-linux-musl-arm64 when supported
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.2
