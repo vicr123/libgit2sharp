@@ -47,55 +47,55 @@ Write-Host "libgit2 version: $libgit2Filename"
 # Platform-specific configuration
 if ($IsWindows) {
     Write-Host "Setting up Visual Studio environment..."
-    
+
     $vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
     $vsPath = & $vsWhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-    
+
     $targetArch = switch ($RID) {
         "win-x64"   { "amd64" }
         "win-x86"   { "x86" }
         "win-arm64" { "arm64" }
     }
-    
+
     $launchVsDevShellPath = "$vsPath\Common7\Tools\Launch-VsDevShell.ps1"
     & $launchVsDevShellPath -Arch $targetArch -HostArch amd64
-    
+
     $buildRoot = Join-Path $PSScriptRoot "build-$RID"
     $installDir = Join-Path $buildRoot "install"
-    
+
 } elseif ($IsLinux) {
     $isMusl = $RID -like "*musl*"
     $arch = switch ($RID) {
         "linux-x64"        { "x86_64" }
-        "linux-arm64"      { "aarch64" }  
+        "linux-arm64"      { "aarch64" }
         "linux-arm"        { "armv7l" }
         "linux-musl-x64"   { "x86_64" }
         "linux-musl-arm64" { "aarch64" }
     }
-    
+
     Write-Host "Building for $arch architecture (musl: $isMusl)"
-    
+
     $buildRoot = "/tmp/build-$RID"
     $installDir = "/tmp/install-$RID"
-    
+
 } elseif ($IsMacOS) {
     $arch = switch ($RID) {
         "osx-x64"   { "x86_64" }
         "osx-arm64" { "arm64" }
     }
-    
+
     $minVersion = switch ($RID) {
         "osx-x64"   { "10.15" }
         "osx-arm64" { "11.0" }
     }
-    
+
     Write-Host "Building for $arch architecture (native compilation)"
-    
+
     Write-Host "Installing OpenSSL@3 via Homebrew..."
     brew install openssl@3
     $opensslRoot = brew --prefix openssl@3
     Write-Host "Using OpenSSL at: $opensslRoot"
-    
+
     $buildRoot = "/tmp/build-$RID"
     $installDir = "/tmp/install-$RID"
 }
@@ -116,7 +116,7 @@ $libssh2Args = @(
     "-GNinja"
     "-DCMAKE_BUILD_TYPE=Release"
     "-DBUILD_SHARED_LIBS=OFF"
-    "-DBUILD_EXAMPLES=OFF" 
+    "-DBUILD_EXAMPLES=OFF"
     "-DBUILD_TESTING=OFF"
     "-DCMAKE_INSTALL_PREFIX=$installDir"
 )
@@ -161,6 +161,7 @@ $libgit2Args = @(
     "-DUSE_SSH=libssh2"
     "-DLIBGIT2_FILENAME=$libgit2Filename"
     "-DCMAKE_INSTALL_PREFIX=$installDir"
+    "-DGIT_SSH_LIBSSH2_MEMORY_CREDENTIALS=1"
 )
 
 # Platform-specific libgit2 arguments
